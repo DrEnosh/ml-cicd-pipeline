@@ -29,5 +29,5 @@ jobs:
         run: |
           cd frontend
           python -c "import streamlit"
-          python -m py_compile streamlit.app.py
+          python -m py_compile app.py
 
