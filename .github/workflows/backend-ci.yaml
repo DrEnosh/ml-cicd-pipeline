@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
           python-version: "3.10"
@@ -20,7 +19,7 @@ jobs:
           pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run checks
+      - name: Run Checks
         working-directory: backend
         run: python -c "import main"
 
@@ -30,11 +29,11 @@ jobs:
           python -m pip install pytest httpx
           python -m pytest tests/
 
-deploy:
+  deploy:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Trigger Render Deploy
-        run: |
-          curl -X POST "$({ secrets.RENDER_DEPLOY_HOOK })"
+        run:
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
