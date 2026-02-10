@@ -1,5 +1,5 @@
 from pathlib import Path
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 import pickle
 import numpy as np
@@ -9,11 +9,7 @@ app = FastAPI(title="Linear Regression API")
 
 default_model_path = Path(__file__).resolve().parent / "models" / "model.pkl"
 MODEL_PATH = Path(os.getenv("MODEL_PATH", str(default_model_path)))
-try:
-    with open(MODEL_PATH, "rb") as f:
-        model = pickle.load(f)
-except Exception as e:
-    raise RuntimeError(f"Failed to load model from {MODEL_PATH}: {e}")
+model = None
 
 
 class InputData(BaseModel):
@@ -21,12 +17,20 @@ class InputData(BaseModel):
     bedrooms: int
 
 
-@app.post("/")
+@app.get("/")
 def health_check():
-    return {"status": "API is running"}
+    return {"status": "API running"}
+
 
 @app.post("/predict")
 def predict(data: InputData):
-    X = np.array([[data.area,data.bedrooms]])
+    global model
+    if model is None:
+        try:
+            with open(MODEL_PATH, "rb") as f:
+                model = pickle.load(f)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Failed to load model from {MODEL_PATH}: {e}")
+    X = np.array([[data.area, data.bedrooms]])
     prediction = model.predict(X)[0]
     return {"predicted_price": float(prediction)}

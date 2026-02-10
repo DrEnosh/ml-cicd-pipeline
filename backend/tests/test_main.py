@@ -8,7 +8,7 @@ import pickle
 import numpy as np
 
 # Import your app (adjust if you renamed it)
-from backend.main import app
+from main import app
 
 client = TestClient(app)
 
