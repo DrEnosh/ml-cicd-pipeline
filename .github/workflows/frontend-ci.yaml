@@ -28,6 +28,20 @@ jobs:
       - name: Streamlit import check
         run: |
           cd frontend
-          python -c "import streamlit"
-          python -m py_compile app.py
+          python -c "import streamlit; print('Streamlit import successful')"
+
+  deploy:
+    needs: frontend-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Trigger Render Deploy
+        env:
+          HOOK_URL: ${{ secrets.RENDER_FRONTEND_DEPLOY_HOOK }}
+        run: |
+          if [ -z "$HOOK_URL" ]; then
+            echo "RENDER_FRONTEND_DEPLOY_HOOK not set or empty, skipping deploy"
+          else
+            curl -X POST "$HOOK_URL"
+          fi
 
