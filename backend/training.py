@@ -1,14 +1,23 @@
-import pandas as pd
+from pathlib import Path
 import pickle
+
+import pandas as pd
 from sklearn.linear_model import LinearRegression
 
-df = pd.read_csv(r'C:\Users\enosh\Desktop\VINAY SIR ASSIGNMENT\mlops_pipeline\data\data.csv')
+ROOT = Path(__file__).resolve().parent.parent
+DATA_PATH = ROOT / "data" / "data.csv"
+MODEL_PATH = ROOT / "backend" / "models" / "model.pkl"
 
-X = df[["area", "bedrooms",]]
+df = pd.read_csv(DATA_PATH)
+
+X = df[["area", "bedrooms"]]
 y = df["price"]
 
 model = LinearRegression()
-model.fit(X, y)     
+model.fit(X, y)
 
-with open(r'C:\Users\enosh\Desktop\VINAY SIR ASSIGNMENT\mlops_pipeline\backend\model.pkl', 'wb') as f:
+MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+with open(MODEL_PATH, "wb") as f:
     pickle.dump(model, f)
+
+print(f"Model saved to {MODEL_PATH}")
